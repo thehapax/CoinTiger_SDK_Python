@@ -1,8 +1,6 @@
 import logging
 from getpass import getpass
 from configparser import ConfigParser, NoOptionError
-from simple_encrypt import test_encrypt, test_decrypt
-#import ccxt
 
 log = logging.getLogger(__name__)
 logging.basicConfig(
@@ -13,6 +11,27 @@ logging.basicConfig(
 # only accept API keys for these ccxt exchanges, cross check here.
 EXCHANGES = ['cointiger', 'binance', 'bitfinex']
 STRATEGIES =['simple', 'ccxt-mirror', 'triangular']
+
+def test_encrypt(input_passwd, config_filename):
+    with open(config_filename, 'rb') as config_file:
+        file_content = config_file.read()
+        cipher_text = encrypt_file(input_passwd, file_content)
+        log.info("Cipher: %s", binascii.hexlify(bytearray(cipher_text)))
+
+    enc_filename = "enc_"+config_filename
+    with open(enc_filename, 'wb') as enc_file:
+        enc_file.write(cipher_text)
+
+    return cipher_text
+
+
+def test_decrypt(input_passwd, config_filename):
+    with open(config_filename, 'rb') as enc_file:
+        content = enc_file.read()
+        plain_text = decrypt_file(input_passwd, content)
+        if plain_text is None:
+            log.info("Plain text unable to decrypt, error")
+    return plain_text
 
 
 def get_exchange_config(content):
@@ -48,10 +67,6 @@ if __name__ == "__main__":
     sname = "ctiger-mirror"
     config_file = "secrets_test2.ini"
 
-    input_passwd = getpass("password: ")
-    test_encrypt(input_passwd, config_file)
-    plain_decrypt = test_decrypt(input_passwd, "enc_"+config_file)
-
     with open(config_file, 'r') as enc_file:
         plain_text = enc_file.read()
         print(plain_text)
@@ -63,6 +78,11 @@ if __name__ == "__main__":
                   f"secret: {secret}, "
                   f"strategy: {strategy}")
 
-        
+
+    input_passwd = getpass("password: ")
+    test_encrypt(input_passwd, config_file)
+    plain_decrypt = test_decrypt(input_passwd, "enc_"+config_file)
+
+
 
 

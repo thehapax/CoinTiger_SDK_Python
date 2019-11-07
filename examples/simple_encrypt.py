@@ -48,23 +48,3 @@ def decrypt_file(input_passwd, cipher_text):
         log.info("Decrypt_file Exception: %s", e)
 
 
-def test_encrypt(input_passwd, config_filename):
-    with open(config_filename, 'rb') as config_file:
-        file_content = config_file.read()
-        cipher_text = encrypt_file(input_passwd, file_content)
-        log.info("Cipher: %s", binascii.hexlify(bytearray(cipher_text)))
-
-    enc_filename = "enc_"+config_filename
-    with open(enc_filename, 'wb') as enc_file:
-        enc_file.write(cipher_text)
-
-    return cipher_text
-
-
-def test_decrypt(input_passwd, config_filename):
-    with open(config_filename, 'rb') as enc_file:
-        content = enc_file.read()
-        plain_text = decrypt_file(input_passwd, content)
-        if plain_text is None:
-            log.info("Plain text unable to decrypt, error")
-    return plain_text

@@ -11,7 +11,8 @@ logging.basicConfig(
 )
 
 print(cointiger.timestamp())
-print(cointiger.currencys())
+all_currencies = cointiger.currencys()
+print(all_currencies)  # fees, pairs and min withdrawls listed here.
 
 sname = "ctiger-mirror"
 config_file = "../safe/secrets_test2.ini"
@@ -33,12 +34,15 @@ order_data = {
     'api_key': api_key,
     'symbol': 'btcusdt',
     'price': '0.01',
-    'volume': '0.01',
+    'volume': '1',
     'side': const.SideType.BUY.value,
     'type': const.OrderType.LimitOrder.value,
     'time': int(time.time())
 }
+
+log.info("COINTIGER: get signature from order data")
 print(cointiger.get_sign(order_data))
+log.info("COINTIGER PLACE ORDER")
 print(cointiger.order(dict(order_data, **{'sign': cointiger.get_sign(order_data)})))
 
 cancel_data = {
@@ -46,5 +50,9 @@ cancel_data = {
     'orderIdList': '{"btcusdt":["1","2"],"ethusdt":["11","22"]}',
     'time': int(time.time()),
 }
+
+log.info("COINTIGER BATCH CANCEL")
 print(cointiger.batch_cancel(dict(cancel_data, **{'sign': cointiger.get_sign(cancel_data)})))
+
+log.info("COINTIGER orders cancelled")
 print(cointiger.orders('btcusdt', 'canceled', int(time.time()), types='buy-market'))
