@@ -4,4 +4,7 @@ idna==2.7
 requests==2.22.0
 six==1.11.0
 urllib3==1.23
-websocket-client==0.45.0
+#websocket-client==0.45.0
+cointiger-sdk==0.1.2
+websocket-client==0.56.0
+requests==2.22.0

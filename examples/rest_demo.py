@@ -1,58 +1,50 @@
 import time
-
+import logging
 from cointiger_sdk import cointiger
 from cointiger_sdk import const
+from test_encrypt_config import get_exchange_config, get_by_strategy_name
 
-# 时间戳
+log = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
+
 print(cointiger.timestamp())
-# 支持币种
 print(cointiger.currencys())
 
-# 24小时行情
-print(cointiger.ticker('btcusdt'))
-# 深度
-print(cointiger.depth('btcusdt'))
-# k线
-print(cointiger.kline('btcusdt', '1min'))
-# 成交历史
-print(cointiger.trade('btcusdt'))
-# 24小时行情列表
-print(cointiger.tickers())
+sname = "ctiger-mirror"
+config_file = "../safe/secrets_test2.ini"
 
-api_key = 'xxxxxx'
-secret = 'xxxxxxxxxxx'
+with open(config_file, 'r') as enc_file:
+    plain_text = enc_file.read()
+    print(plain_text)
+    parser = get_exchange_config(plain_text)
+    strategy, api_key, secret, exchange_name =  get_by_strategy_name(parser, sname)
+    log.info( f"strategy-name: {sname}, "
+              f"exchange: {exchange_name}, "
+              f"api_key: {api_key}, "
+              f"secret: {secret}, "
+              f"strategy: {strategy}")
+
 cointiger.set_key_and_secret(api_key, secret)
 
 order_data = {
     'api_key': api_key,
     'symbol': 'btcusdt',
     'price': '0.01',
-    'volume': '1',
+    'volume': '0.01',
     'side': const.SideType.BUY.value,
     'type': const.OrderType.LimitOrder.value,
     'time': int(time.time())
 }
-# 签名
 print(cointiger.get_sign(order_data))
-# 创建订单
 print(cointiger.order(dict(order_data, **{'sign': cointiger.get_sign(order_data)})))
 
-# 撤销订单
 cancel_data = {
     'api_key': api_key,
     'orderIdList': '{"btcusdt":["1","2"],"ethusdt":["11","22"]}',
     'time': int(time.time()),
 }
 print(cointiger.batch_cancel(dict(cancel_data, **{'sign': cointiger.get_sign(cancel_data)})))
-
-# 查询委托
 print(cointiger.orders('btcusdt', 'canceled', int(time.time()), types='buy-market'))
-
-# 查询成交
-print(cointiger.match_results('btcusdt', '2018-07-18', '2018-07-19', int(time.time())))
-
-# 查询成交明细
-print(cointiger.make_detail('btcusdt', '123', int(time.time())))
-
-# 查询订单详情
-print(cointiger.details('btcusdt', '123', int(time.time())))
