@@ -34,6 +34,7 @@ type_dict = {
         'param': '1min'
     },
 }
+
 cointiger_websocket.set_sub_type_dict(type_dict)
 cointiger_websocket.set_pairs(['btcusdt', 'ethusdt'])
 cointiger_websocket.tick_forever()
